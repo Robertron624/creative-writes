@@ -1,6 +1,7 @@
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import App from 'next/app'
 import Head from 'next/head'
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Message from '../components/message';
 import { db } from '../utils/firebase'
@@ -35,6 +36,9 @@ function Home() {
           {allPosts.map((post) => {
             return(
               <Message key={post.id} {...post}>
+                <Link href={{pathname: `/${post.id}`, query: {...post}}}>
+                  <button>{post.comments?.length > 0 ? post.comments?.length : 0} Comments</button>
+                </Link>
               </Message>
             )
           })}
