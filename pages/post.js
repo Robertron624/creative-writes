@@ -1,7 +1,7 @@
 import { auth, db } from "../utils/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/router";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -12,6 +12,8 @@ function Post() {
   const router = useRouter();
 
   const [user, loading] = useAuthState(auth);
+
+  const updateData = router.query;
 
   const submitPost = async (e) => {
     e.preventDefault();
@@ -35,27 +37,55 @@ function Post() {
         return;
     }
 
-    // Post new post to database
-    const collectionRef = collection(db, "post");
+    if(post?.hasOwnProperty('id')){
+      const docRef = doc(db, 'post', post.id);
+      const updatedPost = {...post, timestamp : serverTimestamp()};
+      await updateDoc(docRef, updatedPost)
+      return router.push('/')
+    }
+    else{
+      // Post new post to database
+      const collectionRef = collection(db, "post");
+  
+      await addDoc(collectionRef, {
+        ...post,
+        timestamp: serverTimestamp(),
+        user: user.uid,
+        avatar: user.photoURL,
+        username: user.displayName,
+      });
+  
+      setPost({
+            description: "",
+      });
 
-    await addDoc(collectionRef, {
-      ...post,
-      timestamp: serverTimestamp(),
-      user: user.uid,
-      avatar: user.photoURL,
-      username: user.displayName,
-    });
+      toast.success("Post submitted 🚀🚀🚀", {
+        autoClose: 1500,
+        position: toast.POSITION.TOP_CENTER,
+      })
 
-    setPost({
-          description: "",
-    });
-    return router.push('/')
+      return router.push('/')
+    }
   };
+
+  const checkUser = () => {
+      if(loading) return;
+      if(!user) return router.push('/auth/login');
+      if(updateData.id){
+        setPost({description: updateData.description, id: updateData.id})
+      }
+  }
+
+  useEffect(() => {
+    checkUser()
+  }, [user, loading]);
 
   return (
     <div className="my-20 p-12 shadow-lg rounded-lg max-w-md mx-auto">
       <form onSubmit={submitPost}>
-        <h1 className="text-2xl font-bold">Create a new post!</h1>
+        <h1 className="text-2xl font-bold">
+          {post.hasOwnProperty('id') ? "Edit your post" : "Create a new post"}
+        </h1>
         <div className="py-2">
           <h3 className="text-lg font-medium py-2">Description</h3>
           <textarea
