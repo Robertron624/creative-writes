@@ -10,7 +10,7 @@ function Nav() {
   return (
     <nav className="flex justify-between items-center py-10">
       <Link href="/">
-        <button>Creative minds</button>
+        <button className="text-7xl">Creative minds</button>
       </Link>
       <ul className="flex items-center gap-10">
         {!user && (
@@ -23,7 +23,7 @@ function Nav() {
         {user && (
             <li className="flex items-center gap-6">
                 <Link href={"/post"}>
-                  <button className="font-medium py-2 px-4 text-sm text-white bg-cyan-500">Post</button>
+                  <button className="font-medium rounded-md py-2 px-14 text-sm text-white bg-cyan-500">Post</button>
                 </Link>
                 <Link href={"/dashboard"}>
                   <img className="rounded-full w-9 cursor-pointer" alt="user profile icon" src={user.photoURL}/>

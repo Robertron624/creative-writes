@@ -32,7 +32,7 @@ function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className='my-12 text-lg font-medium'>
-          <h2>See what other users are posting</h2>
+          <h2 className=' mb-6 text-5xl'>See what other users are posting</h2>
           {allPosts.map((post) => {
             return(
               <Message key={post.id} {...post}>
